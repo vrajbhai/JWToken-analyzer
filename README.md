@@ -146,7 +146,7 @@ pip install PyJWT cryptography
 ```
 project-11-jwtshield/
 │
-├── jwt_analyzer.html     # Main application (single file, no dependencies)
+├── index.html     # Main application (single file, no dependencies) - jwt_analyzer
 ├── README.md             # This file
 └── jwt_analyzer.docx     # Project documentation
 ```
