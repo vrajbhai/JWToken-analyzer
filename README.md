@@ -158,7 +158,7 @@ This tool is intended for **educational purposes** and **authorized security tes
 ## 👤 Author
 > **Project 11** · Python Security Tooling Series  
 > *Decode · Audit · Brute-Force · Forge · Attack Simulation*
->Built with Web Crypto API · Targets Python/PyJWT ecosystem
+> Built with Web Crypto API · Targets Python/PyJWT ecosystem
 
 ---
 
