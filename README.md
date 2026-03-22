@@ -1,13 +1,9 @@
 # 🔐 JWTShield — JWT Analyzer & Tester
-
-> **Project 11** · Python Security Tooling Series  
-> *Decode · Audit · Brute-Force · Forge · Attack Simulation*
-
 ---
 
 ## 📌 Project Name
 
-**JWTShield**
+**JWToken-analyzer**
 
 ## 📝 Short Description
 
@@ -160,9 +156,9 @@ This tool is intended for **educational purposes** and **authorized security tes
 ---
 
 ## 👤 Author
-
-**Project 11** of the Python Security Tooling Series  
-Built with Web Crypto API · Targets Python/PyJWT ecosystem
+> **Project 11** · Python Security Tooling Series  
+> *Decode · Audit · Brute-Force · Forge · Attack Simulation*
+>Built with Web Crypto API · Targets Python/PyJWT ecosystem
 
 ---
 
