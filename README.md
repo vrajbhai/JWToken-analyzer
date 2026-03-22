@@ -1,11 +1,8 @@
 # 🔐 JWTShield — JWT Analyzer & Tester
 ---
 
-## 📌 Project Name
-
-**JWToken-analyzer**
-
-## 📝 Short Description
+## 📌 **JWToken-analyzer**
+### 📝 Short Description
 
 A browser-based JWT (JSON Web Token) security analyzer and pen-testing toolkit. Paste any JWT to instantly decode it, audit it against 20+ security checks, brute-force weak HMAC secrets using a built-in wordlist, forge tampered tokens, simulate real-world attack vectors, and generate production-ready Python/PyJWT fix code — all with zero backend, running entirely in the browser via the Web Crypto API.
 
