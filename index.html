@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JWT Analyzer & Tester</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#0f1115;--bg3:#181b21;--bg4:#1e2128;--bg5:#252830;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#e2e4ea;--text2:#7c8096;--text3:#4d5068;
+  --accent:#6c6fff;--accent2:#8b8dff;
+  --green:#22c55e;--red:#ef4444;--amber:#f59e0b;--cyan:#22d3ee;--purple:#a78bfa;
+  --mono:'JetBrains Mono',monospace;--sans:'Syne',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
+.header{background:#0d0f14;border-bottom:1px solid var(--border);padding:16px 26px;display:flex;align-items:center;gap:13px}
+.logo{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),#4a4ccc);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.htitle{font-size:18px;font-weight:800;background:linear-gradient(90deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hsub{font-size:10.5px;color:var(--text3);margin-top:1px}
+.hbadges{margin-left:auto;display:flex;gap:5px;flex-wrap:wrap}
+.hb{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;font-family:var(--mono)}
+.hb-blue{background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);color:#60a5fa}
+.hb-green{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);color:#4ade80}
+.hb-amber{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);color:#fbbf24}
+.nav{display:flex;gap:2px;padding:10px 26px 0;background:#0d0f14;border-bottom:1px solid var(--border)}
+.nt{font-size:11.5px;font-weight:600;padding:6px 14px;border-radius:8px 8px 0 0;cursor:pointer;border:1px solid transparent;border-bottom:none;background:transparent;color:var(--text3);font-family:var(--sans);transition:all .15s;position:relative;top:1px}
+.nt.active{background:var(--bg);color:var(--text);border-color:var(--border);border-bottom-color:var(--bg)}
+.nt:hover:not(.active){color:var(--text2)}
+.view{display:none}.view.active{display:block}
+.two-col{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 108px)}
+.panel{padding:20px 24px;border-right:1px solid var(--border);overflow-y:auto}
+.panel:last-child{border-right:none}
+.plabel{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);margin-bottom:11px;display:flex;align-items:center;gap:6px}
+.plabel::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent);display:inline-block}
+.ta{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--mono);font-size:11.5px;line-height:1.7;padding:11px 13px;resize:vertical;min-height:85px;transition:border-color .2s;outline:none}
+.ta:focus{border-color:var(--accent)}
+.ta::placeholder{color:var(--text3)}
+.inp{background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--mono);font-size:11.5px;padding:6px 10px;outline:none;transition:border-color .2s;width:100%}
+.inp:focus{border-color:var(--accent)}
+.inp::placeholder{color:var(--text3)}
+select.inp{cursor:pointer}
+.brow{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.btn{font-family:var(--sans);font-size:11px;font-weight:600;padding:6px 13px;border-radius:7px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+.btn:hover{background:var(--bg4);border-color:var(--accent);color:var(--accent2)}
+.btnp{background:var(--accent);border-color:var(--accent);color:#fff}
+.btnp:hover{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.btnd{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--red)}
+.btnd:hover{background:rgba(239,68,68,0.2)}
+.btng{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:var(--green)}
+.btng:hover{background:rgba(34,197,94,0.2)}
+.btn-sm{font-size:10px;padding:3px 8px}
+.tc{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:11px 13px;font-family:var(--mono);font-size:11.5px;line-height:1.8;word-break:break-all;min-height:48px}
+.jh{color:#f87171}.jp{color:#fb923c}.js{color:#a78bfa}.jdot{color:var(--text3)}
+.dblock{background:var(--bg3);border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:8px}
+.dbhdr{padding:7px 12px;font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.lh{color:#f87171}.lp{color:#fb923c}.ls{color:#a78bfa}
+.dbbody{padding:10px 12px;font-family:var(--mono);font-size:11px;line-height:1.85;white-space:pre-wrap;word-break:break-all}
+.jk{color:#93c5fd}.jstr{color:#86efac}.jnum{color:#fcd34d}.jbool{color:var(--purple)}.jnull{color:var(--text3)}
+.tsgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.tscard{background:var(--bg4);border:1px solid var(--border);border-radius:7px;padding:8px 11px}
+.tslabel{font-size:9.5px;color:var(--text3);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px}
+.tsval{font-size:11px;font-family:var(--mono);color:var(--text)}
+.tshuman{font-size:10px;color:var(--text2);margin-top:1px}
+.tscd{font-size:10.5px;font-weight:600;margin-top:2px;font-family:var(--mono)}
+.cd-exp{color:var(--red)}.cd-soon{color:var(--amber)}.cd-ok{color:var(--green)}
+.finding{display:flex;gap:9px;padding:8px 11px;border-radius:7px;margin-bottom:5px;border:1px solid transparent}
+.f-c{background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.22)}
+.f-w{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.22)}
+.f-i{background:rgba(34,211,238,0.06);border-color:rgba(34,211,238,0.15)}
+.f-o{background:rgba(34,197,94,0.06);border-color:rgba(34,197,94,0.15)}
+.ficon{font-size:12px;flex-shrink:0;margin-top:1px}
+.ftitle{font-size:12px;font-weight:600;margin-bottom:2px}
+.f-c .ftitle{color:var(--red)}.f-w .ftitle{color:var(--amber)}.f-i .ftitle{color:var(--cyan)}.f-o .ftitle{color:var(--green)}
+.fdesc{font-size:11px;color:var(--text2);line-height:1.5}
+.swrap{display:flex;align-items:center;gap:14px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;margin-bottom:11px}
+.ring-outer{position:relative;width:52px;height:52px;flex-shrink:0}
+.ring-outer svg{transform:rotate(-90deg)}
+.rbg{fill:none;stroke:var(--bg4);stroke-width:5}
+.rfill{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1),stroke .3s}
+.rlabel{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:600}
+.stext h3{font-size:14px;font-weight:700}
+.stext p{font-size:10.5px;color:var(--text2);margin-top:2px}
+.fixblock{background:var(--bg3);border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-top:9px}
+.fixhdr{padding:8px 12px;font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.fixcode{padding:12px 14px;font-family:var(--mono);font-size:10.5px;line-height:1.9;color:#c4cfde;white-space:pre;overflow-x:auto}
+.pk{color:#c792ea}.ps{color:#c3e88d}.pc{color:#546e7a;font-style:italic}.pb{color:#82aaff}.pf{color:#82aaff}.pv{color:#f07178}.pn{color:#f78c6c}
+.bsec{background:var(--bg3);border:1px solid rgba(245,158,11,0.2);border-radius:9px;overflow:hidden;margin-top:14px}
+.bhdr{padding:8px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.btitle{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--amber)}
+.bbody{padding:12px}
+.bpwrap{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin:8px 0 5px}
+.bpbar{height:100%;width:0;background:var(--amber);border-radius:2px;transition:width .1s linear}
+.bstatus{font-size:10.5px;color:var(--text2);font-family:var(--mono);min-height:14px;margin-bottom:6px}
+.bstats{display:flex;gap:10px;flex-wrap:wrap}
+.bstat{font-size:10px;font-family:var(--mono);color:var(--text2)}
+.bstat span{color:var(--text);font-weight:600}
+.crackbox{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:7px;padding:9px 12px;margin-top:7px}
+.clabel{font-size:10px;color:var(--red);font-weight:600;letter-spacing:.5px;margin-bottom:3px}
+.csecret{font-family:var(--mono);font-size:14px;font-weight:600;color:#fff;letter-spacing:1px}
+.safebox{background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.2);border-radius:7px;padding:8px 12px;margin-top:7px;font-size:11px;color:var(--green)}
+.algrow{display:flex;align-items:center;gap:7px;margin-bottom:8px;font-size:11.5px;color:var(--text2);flex-wrap:wrap}
+.vres{padding:8px 12px;border-radius:7px;margin-top:8px;font-size:11.5px;font-weight:600}
+.vok{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:var(--green)}
+.vfail{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:var(--red)}
+.forgegrid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.crow{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.crow .inp{flex:1}
+.ckey{width:105px;flex-shrink:0}
+.cdel{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:0 3px;transition:color .15s}
+.cdel:hover{color:var(--red)}
+.forgeout{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:11px 13px;font-family:var(--mono);font-size:10.5px;word-break:break-all;line-height:1.7;min-height:55px;color:var(--text2)}
+.histitem{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 11px;margin-bottom:6px;cursor:pointer;transition:border-color .15s,background .15s;display:flex;align-items:center;gap:9px}
+.histitem:hover{border-color:var(--accent);background:var(--bg4)}
+.halg{font-size:9.5px;font-weight:600;padding:2px 6px;border-radius:4px;font-family:var(--mono);flex-shrink:0}
+.halg-h{background:rgba(245,158,11,0.15);color:var(--amber)}
+.halg-a{background:rgba(34,197,94,0.12);color:var(--green)}
+.halg-n{background:rgba(239,68,68,0.15);color:var(--red)}
+.hsub{font-size:11.5px;font-weight:600;color:var(--text)}
+.hprev{font-size:10px;font-family:var(--mono);color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.acard{background:var(--bg3);border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:9px}
+.achdr{padding:8px 12px;font-size:11px;font-weight:600;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.abody{padding:10px 12px;font-size:11.5px;color:var(--text2);line-height:1.6}
+.a-c{border-left:3px solid var(--red)}.a-w{border-left:3px solid var(--amber)}
+.ademo{font-size:10px;padding:3px 9px;border-radius:5px;border:1px solid var(--border2);background:var(--bg4);color:var(--text);cursor:pointer;font-family:var(--sans);font-weight:600;transition:all .15s}
+.ademo:hover{border-color:var(--accent);color:var(--accent2)}
+.slist{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+.si{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:border-color .15s,background .15s;font-size:11px}
+.si:hover{border-color:var(--accent);background:var(--bg4)}
+.sb{font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;flex-shrink:0;text-transform:uppercase}
+.bd{background:rgba(239,68,68,0.15);color:var(--red)}
+.bw{background:rgba(245,158,11,0.15);color:var(--amber)}
+.bo{background:rgba(34,197,94,0.15);color:var(--green)}
+.sn{color:var(--text);font-weight:600}
+.sd{color:var(--text3);font-size:10px;margin-top:1px}
+.tag{display:inline-block;font-size:9.5px;padding:1px 5px;border-radius:3px;font-family:var(--mono);margin-right:3px}
+.tr{background:rgba(239,68,68,0.15);color:var(--red)}
+.ta2{background:rgba(245,158,11,0.12);color:var(--amber)}
+hr.d{border:none;border-top:1px solid var(--border);margin:13px 0}
+.empty{color:var(--text3);font-size:12px;text-align:center;padding:32px 16px;line-height:1.7}
+.eicon{font-size:26px;margin-bottom:7px;opacity:.35}
+.toast{position:fixed;bottom:16px;right:16px;background:var(--accent);color:#fff;padding:6px 13px;border-radius:7px;font-size:11px;font-weight:600;opacity:0;transform:translateY(6px);transition:all .2s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateY(0)}
+@media(max-width:780px){.two-col{grid-template-columns:1fr}.panel{border-right:none;border-bottom:1px solid var(--border)}.header{padding:12px 14px}.forgegrid{grid-template-columns:1fr}.tsgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">🔐</div>
+  <div>
+    <div class="htitle">JWT Analyzer & Tester</div>
+    <div class="hsub">Decode · Audit · Brute-Force · Forge · Attack Simulation · History</div>
+  </div>
+  <div class="hbadges">
+    <div class="hb hb-blue">Python / PyJWT</div>
+    <div class="hb hb-green">Web Crypto API</div>
+    <div class="hb hb-amber">Pen-Test Ready</div>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nt active" onclick="switchTab('analyze',this)">🔍 Analyze</button>
+  <button class="nt" onclick="switchTab('forge',this)">⚗️ Forge / Tamper</button>
+  <button class="nt" onclick="switchTab('attacks',this)">💀 Attack Sim</button>
+  <button class="nt" onclick="switchTab('history',this)">📜 History</button>
+</div>
+
+<!-- ══ ANALYZE ══ -->
+<div id="view-analyze" class="view active">
+<div class="two-col">
+<div class="panel">
+  <div class="plabel">Sample Tokens</div>
+  <div class="slist">
+    <div class="si" onclick="loadSample('none')"><div class="sb bd">CRITICAL</div><div><div class="sn">alg:none Bypass</div><div class="sd">Algorithm "none" — skips signature check entirely</div></div></div>
+    <div class="si" onclick="loadSample('weak')"><div class="sb bd">CRITICAL</div><div><div class="sn">Weak HS256 Secret ("secret")</div><div class="sd">Top-1 in every brute-force wordlist</div></div></div>
+    <div class="si" onclick="loadSample('sensitive')"><div class="sb bd">CRITICAL</div><div><div class="sn">Sensitive Data in Payload</div><div class="sd">Password + credit card stored in plaintext</div></div></div>
+    <div class="si" onclick="loadSample('kid')"><div class="sb bd">CRITICAL</div><div><div class="sn">kid Injection Attack</div><div class="sd">SQL injection in key ID header</div></div></div>
+    <div class="si" onclick="loadSample('expired')"><div class="sb bw">WARNING</div><div><div class="sn">Expired + Minimal Claims</div><div class="sd">No iss/aud/jti, expired token</div></div></div>
+    <div class="si" onclick="loadSample('good')"><div class="sb bo">GOOD</div><div><div class="sn">Well-formed RS256</div><div class="sd">Asymmetric, all claims, 15-min expiry</div></div></div>
+  </div>
+
+  <div class="plabel">Paste JWT</div>
+  <textarea class="ta" id="tokenInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…" rows="4" oninput="liveUpdate()"></textarea>
+  <div class="brow">
+    <button class="btn btnp" onclick="doAnalyze()">⚡ Analyze</button>
+    <button class="btn" onclick="clearAll()">✕ Clear</button>
+    <button class="btn" onclick="copyFix()">⎘ Python Fix</button>
+    <button class="btn" onclick="exportReport()">↓ Export JSON</button>
+  </div>
+
+  <hr class="d">
+  <div class="plabel">Token Structure</div>
+  <div class="tc" id="tokenColored"><span style="color:var(--text3);font-family:var(--mono);font-size:11px">Paste a token above…</span></div>
+
+  <hr class="d">
+  <div class="plabel">Decoded Claims</div>
+  <div id="decodeSection"><div class="empty"><div class="eicon">🔍</div>Header · Payload · Signature appear here</div></div>
+
+  <hr class="d">
+  <div class="plabel">Verify Signature (HMAC)</div>
+  <div style="display:flex;gap:6px;align-items:center">
+    <input class="inp" id="verifySecret" placeholder="Known secret to verify…" style="flex:1">
+    <select class="inp" id="verifyAlg" style="width:85px"><option>HS256</option><option>HS384</option><option>HS512</option></select>
+    <button class="btn btng btn-sm" onclick="verifySignature()">✓ Verify</button>
+  </div>
+  <div id="verifyResult"></div>
+</div>
+
+<div class="panel" id="rightPanel">
+  <div class="plabel">Security Findings</div>
+  <div id="analysisContainer"><div class="empty"><div class="eicon">🛡️</div>Analyze a token to see findings,<br>score, timestamps and Python fix</div></div>
+
+  <div class="bsec" id="bruteSection" style="display:none">
+    <div class="bhdr">
+      <div class="btitle">🔨 Wordlist Secret Brute-Force</div>
+      <button class="btn btn-sm" id="bruteBtn" onclick="toggleBrute()">▶ Run</button>
+    </div>
+    <div class="bbody">
+      <div class="algrow">
+        <span>Alg:</span>
+        <select class="inp" id="bruteAlg" style="width:82px"><option>HS256</option><option>HS384</option><option>HS512</option></select>
+        <span>Wordlist:</span>
+        <select class="inp" id="wordlistSel" onchange="onWLChange()" style="width:150px">
+          <option value="top100">Top 100 common secrets</option>
+          <option value="top500">Top 500 expanded</option>
+          <option value="custom">Custom list</option>
+        </select>
+        <span id="wlLabel" style="color:var(--text3);font-family:var(--mono);font-size:10px">100 words</span>
+      </div>
+      <textarea class="ta" id="customWords" placeholder="One word per line…" style="display:none;min-height:65px;margin-bottom:7px" oninput="updateWLCount()"></textarea>
+      <div class="bpwrap"><div class="bpbar" id="bpbar"></div></div>
+      <div class="bstatus" id="bstatus">Ready — click ▶ Run to start</div>
+      <div class="bstats">
+        <div class="bstat">Tested: <span id="sTested">0</span></div>
+        <div class="bstat">Speed: <span id="sSpeed">—</span>/s</div>
+        <div class="bstat">Elapsed: <span id="sTime">0.0s</span></div>
+        <div class="bstat">Left: <span id="sLeft">—</span></div>
+      </div>
+      <div id="bruteResult"></div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ══ FORGE ══ -->
+<div id="view-forge" class="view">
+<div class="two-col">
+<div class="panel">
+  <div class="plabel">Header Claims</div>
+  <div id="forgeHClaims"></div>
+  <button class="btn btn-sm" onclick="addClaim('h')" style="margin-bottom:13px">+ Add Header Claim</button>
+
+  <div class="plabel">Payload Claims</div>
+  <div id="forgePClaims"></div>
+  <button class="btn btn-sm" onclick="addClaim('p')">+ Add Payload Claim</button>
+
+  <hr class="d">
+  <div class="plabel">Sign With (HMAC)</div>
+  <div style="display:flex;gap:6px;align-items:center">
+    <input class="inp" id="forgeSecret" placeholder="Secret (blank = unsigned)" style="flex:1">
+    <select class="inp" id="forgeAlg" style="width:85px"><option>HS256</option><option>HS384</option><option>HS512</option><option value="none">none</option></select>
+  </div>
+  <div class="brow" style="margin-top:9px">
+    <button class="btn btnp" onclick="forgeToken()">⚗️ Generate Token</button>
+    <button class="btn" onclick="resetForge()">↺ Reset</button>
+    <button class="btn btn-sm" onclick="loadForgeFromAnalysis()">← Load Current</button>
+  </div>
+
+  <hr class="d">
+  <div class="plabel">Quick Presets</div>
+  <div style="display:flex;flex-wrap:wrap;gap:5px">
+    <button class="btn btn-sm" onclick="applyPreset('admin')">Admin Escalation</button>
+    <button class="btn btn-sm" onclick="applyPreset('longexp')">30-day Expiry</button>
+    <button class="btn btn-sm" onclick="applyPreset('noexp')">No Expiry</button>
+    <button class="btn btn-sm" onclick="applyPreset('algnone')">alg:none</button>
+    <button class="btn btn-sm" onclick="applyPreset('minimal')">Minimal</button>
+    <button class="btn btn-sm" onclick="applyPreset('rs256hdr')">RS256 Header</button>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="plabel">Generated Token</div>
+  <div class="forgeout" id="forgeOut">Token appears here after generation…</div>
+  <div class="brow" style="margin-top:7px">
+    <button class="btn btn-sm" onclick="copyForged()">⎘ Copy Token</button>
+    <button class="btn btn-sm" onclick="sendForgedToAnalyzer()">→ Send to Analyzer</button>
+  </div>
+
+  <hr class="d">
+  <div class="plabel">Preview</div>
+  <div id="forgePreview"><div class="empty"><div class="eicon">⚗️</div>Generate a token to preview it</div></div>
+</div>
+</div>
+</div>
+
+<!-- ══ ATTACKS ══ -->
+<div id="view-attacks" class="view">
+<div class="two-col">
+<div class="panel">
+  <div class="plabel">Known JWT Attack Vectors</div>
+
+  <div class="acard a-c">
+    <div class="achdr"><span><span class="tag tr">CRITICAL</span> alg:none Signature Bypass</span><button class="ademo" onclick="demoAttack('none')">Demo →</button></div>
+    <div class="abody">Set <code style="color:var(--cyan);font-family:var(--mono)">alg:"none"</code> — vulnerable libraries skip verification entirely. Attacker can forge any payload including privilege escalation. CVE pattern: <code style="color:var(--amber);font-family:var(--mono)">jwt.decode(token, options={"verify_signature":False})</code></div>
+  </div>
+
+  <div class="acard a-c">
+    <div class="achdr"><span><span class="tag tr">CRITICAL</span> Algorithm Confusion (RS256→HS256)</span><button class="ademo" onclick="demoAttack('algconfusion')">Demo →</button></div>
+    <div class="abody">If a server accepts both RS256 and HS256, attacker uses the <b style="color:var(--text)">public key</b> (which is public!) as the HMAC secret. Server verifies with public key — it matches. Fix: never list both in one <code style="color:var(--amber);font-family:var(--mono)">algorithms=[]</code> allowlist.</div>
+  </div>
+
+  <div class="acard a-c">
+    <div class="achdr"><span><span class="tag tr">CRITICAL</span> kid Header Injection</span><button class="ademo" onclick="demoAttack('kid')">Demo →</button></div>
+    <div class="abody"><code style="color:var(--cyan);font-family:var(--mono)">kid: "../../dev/null"</code> → empty key → trivial sign<br><code style="color:var(--cyan);font-family:var(--mono)">kid: "x' UNION SELECT 'secret'--"</code> → SQL injection<br>Validate kid strictly: <code style="color:var(--amber);font-family:var(--mono)">re.match(r'^[a-zA-Z0-9\-_]{1,64}$', kid)</code></div>
+  </div>
+
+  <div class="acard a-w">
+    <div class="achdr"><span><span class="tag ta2">WARNING</span> Weak Secret Brute-Force</span><button class="ademo" onclick="demoAttack('bruteforce')">Demo →</button></div>
+    <div class="abody">Anyone with a JWT can run offline brute-force. hashcat tests billions/sec. Common secrets crack in milliseconds. The demo token uses <code style="color:var(--red);font-family:var(--mono)">"secret"</code> — send to Analyzer to crack it instantly.</div>
+  </div>
+
+  <div class="acard a-w">
+    <div class="achdr"><span><span class="tag ta2">WARNING</span> Replay Attack (no jti / no exp)</span><button class="ademo" onclick="demoAttack('replay')">Demo →</button></div>
+    <div class="abody">Without <code style="color:var(--cyan);font-family:var(--mono)">jti</code> + server denylist, stolen tokens are valid until expiry. Even after logout. Fix: jti on every token + Redis denylist on logout.</div>
+  </div>
+
+  <div class="acard a-w">
+    <div class="achdr"><span><span class="tag ta2">WARNING</span> Privilege Escalation via Payload Tampering</span><button class="ademo" onclick="demoAttack('privesc')">Demo →</button></div>
+    <div class="abody">If signature verification is skipped or misconfigured, Base64-decode payload, change <code style="color:var(--amber);font-family:var(--mono)">role:"user"</code>→<code style="color:var(--red);font-family:var(--mono)">role:"admin"</code>, re-encode and submit. Never trust payload claims without verifying the signature.</div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="plabel">Attack Demo Output</div>
+  <div id="attackOut"><div class="empty"><div class="eicon">💀</div>Click "Demo →" to generate an attack token</div></div>
+
+  <hr class="d">
+  <div class="plabel">Python Defence Template</div>
+  <div class="fixblock">
+    <div class="fixhdr"><span>🐍 Secure PyJWT Validation</span></div>
+    <div class="fixcode"><span class="pk">import</span> <span class="pb">jwt</span>, <span class="pb">re</span>
+<span class="pk">from</span> <span class="pb">jwt.exceptions</span> <span class="pk">import</span> DecodeError, ExpiredSignatureError
+
+<span class="pc"># NEVER disable verification:</span>
+<span class="pc"># jwt.decode(token, options={"verify_signature": False})  ← BAD</span>
+
+<span class="pk">def</span> <span class="pf">safe_decode</span>(token: str) -> dict:
+    <span class="pk">return</span> jwt.<span class="pf">decode</span>(
+        token,
+        public_key_or_secret,
+        algorithms=[<span class="ps">"RS256"</span>],        <span class="pc"># exact list — never wildcard</span>
+        audience=<span class="ps">"myapp-api"</span>,
+        issuer=<span class="ps">"https://auth.myapp.com"</span>,
+        options={
+            <span class="ps">"require"</span>: [<span class="ps">"exp"</span>,<span class="ps">"iss"</span>,<span class="ps">"aud"</span>,<span class="ps">"jti"</span>,<span class="ps">"sub"</span>],
+            <span class="ps">"verify_exp"</span>: <span class="pk">True</span>,
+        }
+    )
+
+<span class="pc"># Sanitize kid BEFORE using it to look up keys:</span>
+<span class="pk">def</span> <span class="pf">safe_kid</span>(kid: str) -> str:
+    <span class="pk">if not</span> re.<span class="pf">match</span>(<span class="ps">r'^[a-zA-Z0-9\-_]{1,64}$'</span>, kid):
+        <span class="pk">raise</span> ValueError(<span class="ps">"Invalid kid"</span>)
+    <span class="pk">return</span> kid
+
+<span class="pc"># Denylist check (run after decode):</span>
+<span class="pk">def</span> <span class="pf">check_revoked</span>(payload: dict):
+    <span class="pk">if</span> redis.<span class="pf">exists</span>(<span class="pf">f</span><span class="ps">"revoked:{payload['jti']}"</span>):
+        <span class="pk">raise</span> PermissionError(<span class="ps">"Token revoked"</span>)</div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ══ HISTORY ══ -->
+<div id="view-history" class="view">
+<div style="padding:20px 24px;max-width:860px">
+  <div class="plabel" style="margin-bottom:12px">Analyzed Token History</div>
+  <div class="brow" style="margin-bottom:12px">
+    <button class="btn btn-sm btnd" onclick="clearHistory()">🗑 Clear History</button>
+    <button class="btn btn-sm" onclick="exportHistory()">↓ Export JSON</button>
+  </div>
+  <div id="historyList"><div class="empty"><div class="eicon">📜</div>Tokens you analyze appear here.<br>Click any entry to reload it.</div></div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── UTILS ──
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function b64url(obj){return btoa(JSON.stringify(obj)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'')}
+function b64urlDecode(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';try{return JSON.parse(atob(s))}catch(e){return null}}
+function colorJson(o){
+  return JSON.stringify(o,null,2)
+    .replace(/"([^"]+)":/g,'<span class="jk">"$1"</span>:')
+    .replace(/: "([^"]*)"/g,': <span class="jstr">"$1"</span>')
+    .replace(/: (-?\d+(?:\.\d+)?)/g,': <span class="jnum">$1</span>')
+    .replace(/: (true|false)/g,': <span class="jbool">$1</span>')
+    .replace(/: null/g,': <span class="jnull">null</span>')
+}
+function fmtTs(u){if(!u)return'—';return new Date(u*1000).toUTCString().replace(' GMT','Z')}
+function fmtDur(s){if(s<60)return s+'s';if(s<3600)return Math.round(s/60)+'m';if(s<86400)return Math.round(s/3600)+'h '+Math.round((s%3600)/60)+'m';return Math.round(s/86400)+'d'}
+function cdHtml(exp){const d=exp-Math.floor(Date.now()/1000);if(d<0)return`<span class="tscd cd-exp">Expired ${fmtDur(-d)} ago</span>`;if(d<300)return`<span class="tscd cd-soon">Expires in ${fmtDur(d)} ⚠</span>`;return`<span class="tscd cd-ok">Expires in ${fmtDur(d)}</span>`}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1900)}
+function download(name,data,mime){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:mime}));a.download=name;a.click()}
+function stripHtml(s){const d=document.createElement('div');d.innerHTML=s;return d.textContent||d.innerText||''}
+
+// ── CRYPTO ──
+const ALGMAP={'HS256':'SHA-256','HS384':'SHA-384','HS512':'SHA-512'};
+async function hmacSign(secret,msg,alg='HS256'){
+  const enc=new TextEncoder();
+  const k=await crypto.subtle.importKey('raw',enc.encode(secret),{name:'HMAC',hash:ALGMAP[alg]||'SHA-256'},false,['sign']);
+  return new Uint8Array(await crypto.subtle.sign('HMAC',k,enc.encode(msg)));
+}
+function u8toB64url(u8){return btoa(String.fromCharCode(...u8)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'')}
+function bytesEq(a,b){if(!a||!b||a.length!==b.length)return false;for(let i=0;i<a.length;i++)if(a[i]!==b[i])return false;return true}
+
+// ── STATE ──
+const NOW=Math.floor(Date.now()/1000);
+let curHdr=null,curPay=null,curSig='',curFindings=[],curPyFix='';
+let history=[];
+try{history=JSON.parse(localStorage.getItem('jwtHist')||'[]')}catch(e){}
+let bruteRunning=false,bruteAbort=false,bruteSigBytes=null,bruteSignIn='';
+
+// ── SAMPLES ──
+const SAMPLES={
+  none: b64url({alg:'none',typ:'JWT'})+'.'+b64url({sub:'admin_001',name:'Administrator',role:'admin',iat:NOW})+'.',
+  weak: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyXzEyMyIsIm5hbWUiOiJKb2huIERvZSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzAwMDAwMDAwfQ.yUO5a0q77pP7pIFnkxX8H6Xsv5E0jZzNd9_P1x7xZPk',
+  sensitive: b64url({alg:'HS256',typ:'JWT'})+'.'+b64url({sub:'user_456',name:'Jane',email:'jane@example.com',password:'hunter2',credit_card:'4111-1111-1111-1111',role:'user',iat:NOW,exp:NOW+3600})+'.fakesig123',
+  kid: b64url({alg:'HS256',typ:'JWT',kid:"../../dev/null\"; DROP TABLE users;--"})+'.'+b64url({sub:'attacker',role:'admin',iat:NOW,exp:NOW+86400})+'.injection',
+  expired: b64url({alg:'HS256',typ:'JWT'})+'.'+b64url({sub:'user_789',name:'Bob',role:'moderator',iat:1690000000,exp:1690007200})+'.expiredfake',
+  good: b64url({alg:'RS256',typ:'JWT',kid:'key-2024-01'})+'.'+b64url({sub:'user_999',name:'Alice',role:'viewer',iss:'https://auth.myapp.com',aud:'myapp-api',iat:NOW,exp:NOW+900,nbf:NOW,jti:'jti-'+Math.random().toString(36).slice(2)})+'.RS256_SIGNATURE'
+};
+
+// ── NAV ──
+function switchTab(id,btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nt').forEach(t=>t.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='history') renderHistory();
+}
+function switchTabById(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nt').forEach(t=>t.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  const idx={analyze:0,forge:1,attacks:2,history:3}[id];
+  document.querySelectorAll('.nt')[idx].classList.add('active');
+}
+
+// ── LIVE UPDATE ──
+function liveUpdate(){
+  const raw=document.getElementById('tokenInput').value.trim();
+  const el=document.getElementById('tokenColored');
+  if(!raw){el.innerHTML='<span style="color:var(--text3);font-family:var(--mono);font-size:11px">Paste a token above…</span>';return}
+  const parts=raw.split('.');
+  el.innerHTML=parts.map((p,i)=>{
+    const cls=i===0?'jh':i===1?'jp':'js';
+    return(i>0?'<span class="jdot">.</span>':'')+`<span class="${cls}">${esc(p)}</span>`
+  }).join('');
+}
+
+// ── LOAD SAMPLE ──
+function loadSample(k){
+  document.getElementById('tokenInput').value=SAMPLES[k];
+  liveUpdate(); doAnalyze();
+}
+
+// ── ANALYZE ──
+function doAnalyze(){
+  const raw=document.getElementById('tokenInput').value.trim();
+  if(!raw) return;
+  const parts=raw.split('.');
+  if(parts.length<2){renderAnalysis(null,[{sev:'critical',title:'Invalid JWT format',desc:'A valid JWT requires 3 dot-separated Base64url parts.'}],null);return}
+  curHdr=b64urlDecode(parts[0]);
+  curPay=b64urlDecode(parts[1]);
+  curSig=parts[2]||'';
+  renderDecoded(curHdr,curPay,curSig);
+  curFindings=runChecks(curHdr,curPay,curSig);
+  const score=calcScore(curFindings);
+  curPyFix=buildPyFix(curHdr,curPay,curFindings);
+  renderAnalysis(score,curFindings,curPyFix);
+  const isHMAC=curHdr&&['HS256','HS384','HS512'].includes(curHdr.alg);
+  const bs=document.getElementById('bruteSection');
+  if(isHMAC&&curSig){
+    bs.style.display='block';
+    setupBrute(parts[0]+'.'+parts[1],parts[2],curHdr.alg);
+  } else {
+    bs.style.display='none';
+  }
+  saveHist(raw,curHdr,curPay,score,curFindings);
+}
+
+// ── RENDER DECODED ──
+function renderDecoded(h,p,s){
+  const sec=document.getElementById('decodeSection');
+  let html='';
+  html+=`<div class="dblock"><div class="dbhdr"><span class="lh">● Header</span><span style="font-size:9.5px;color:var(--text3)">algorithm & type</span></div><div class="dbbody">${h?colorJson(h):'<span style="color:var(--text3)">Could not decode</span>'}</div></div>`;
+  let tsHtml='';
+  if(p&&(p.iat||p.exp||p.nbf)){
+    tsHtml='<div class="tsgrid">';
+    if(p.iat) tsHtml+=`<div class="tscard"><div class="tslabel">Issued At (iat)</div><div class="tsval">${p.iat}</div><div class="tshuman">${fmtTs(p.iat)}</div></div>`;
+    if(p.exp) tsHtml+=`<div class="tscard"><div class="tslabel">Expires (exp)</div><div class="tsval">${p.exp}</div><div class="tshuman">${fmtTs(p.exp)}</div>${cdHtml(p.exp)}</div>`;
+    if(p.nbf) tsHtml+=`<div class="tscard"><div class="tslabel">Not Before (nbf)</div><div class="tsval">${p.nbf}</div><div class="tshuman">${fmtTs(p.nbf)}</div></div>`;
+    tsHtml+='</div>';
+  }
+  html+=`<div class="dblock"><div class="dbhdr"><span class="lp">● Payload</span><span style="font-size:9.5px;color:var(--text3)">claims</span></div><div class="dbbody">${tsHtml}${p?colorJson(p):'<span style="color:var(--text3)">Could not decode</span>'}</div></div>`;
+  const sd=s||'(empty — unsigned)';
+  const sc=!s?'color:var(--red)':'color:var(--purple)';
+  html+=`<div class="dblock"><div class="dbhdr"><span class="ls">● Signature</span><span style="font-size:9.5px;color:var(--text3)">${!s?'MISSING':s.length+' chars'}</span></div><div class="dbbody" style="${sc}">${esc(sd.substring(0,90))}${sd.length>90?'…':''}</div></div>`;
+  sec.innerHTML=html;
+}
+
+// ── CHECKS ──
+function runChecks(h,p,s){
+  const F=[];const n=Math.floor(Date.now()/1000);
+  if(!h){F.push({sev:'critical',title:'Header could not be decoded',desc:'JWT header is malformed or invalid Base64url JSON.'});return F}
+  const alg=(h.alg||'').toLowerCase();
+
+  // alg:none
+  if(alg==='none') F.push({sev:'critical',title:'alg:"none" — Signature Bypass CVE',desc:'Algorithm is "none". Vulnerable libraries skip all verification, allowing arbitrary payload forgery. A critical CVE-class vulnerability.',fix_key:'alg_none'});
+
+  // missing typ
+  if(!h.typ) F.push({sev:'info',title:'Missing typ header',desc:'typ should be "JWT". Omitting it can confuse token type validation in multi-format systems.'});
+
+  // weak HMAC
+  if(['hs256','hs384','hs512'].includes(alg)) F.push({sev:'warning',title:`${h.alg} used — shared secret risk`,desc:'HMAC uses a single shared secret. If it leaks, all tokens are compromised and offline brute-force is possible. Consider RS256/ES256 (asymmetric).',fix_key:'weak_alg'});
+
+  // strong asym
+  if(['rs256','rs384','rs512','es256','es384','es512','ps256','ps512'].includes(alg)) F.push({sev:'ok',title:`Strong asymmetric algorithm (${h.alg})`,desc:'Only the private key can issue tokens; verification uses the distributable public key.'});
+
+  // algorithm confusion risk
+  if(['rs256','rs384','rs512'].includes(alg)) F.push({sev:'warning',title:'RS256 — watch for algorithm confusion attack',desc:'If your library accepts both RS256 and HS256, an attacker can use your public key as HMAC secret to forge tokens. Use algorithms=["RS256"] exclusively.'});
+
+  // kid injection
+  if(h.kid!==undefined){
+    const kid=String(h.kid);
+    if(/['";\\/]/.test(kid)||kid.includes('..')||kid.length>128)
+      F.push({sev:'critical',title:'Suspicious kid — injection detected',desc:`kid = "${esc(kid.substring(0,60))}" contains injection-prone characters (SQL, path traversal). Validate kid with a strict regex before key lookup.`});
+    else F.push({sev:'ok',title:'kid header present',desc:'Key ID enables rotation. Ensure it is validated with a strict allowlist before use.'});
+  } else if(alg!=='none'){
+    F.push({sev:'info',title:'No kid (Key ID)',desc:'Without kid, key rotation requires invalidating all tokens simultaneously. Add kid for seamless rotation.'});
+  }
+
+  if(!p){F.push({sev:'critical',title:'Payload could not be decoded',desc:'JWT payload is malformed.'});return F}
+
+  // missing sig
+  if(alg!=='none'&&!s) F.push({sev:'critical',title:'Signature segment empty',desc:'Signature missing despite non-none algorithm. Verification will fail or may be silently skipped.'});
+
+  // missing exp
+  if(!p.exp) F.push({sev:'critical',title:'No expiration (exp) claim',desc:'Tokens without exp never expire — stolen tokens grant permanent access. Set exp ≤ 15m for access tokens.',fix_key:'no_exp'});
+
+  // expired
+  if(p.exp&&p.exp<n) F.push({sev:'warning',title:`Token expired ${fmtDur(n-p.exp)} ago`,desc:`exp=${p.exp} (${fmtTs(p.exp)}). If your server accepts this, expiry validation is disabled.`});
+
+  // long TTL
+  if(p.exp&&p.iat&&(p.exp-p.iat)>86400*30) F.push({sev:'warning',title:`Excessive TTL — ${Math.round((p.exp-p.iat)/86400)} days`,desc:'Access tokens should live ≤ 1h. Long-lived tokens multiply blast radius if stolen. Use refresh tokens.',fix_key:'long_exp'});
+
+  // nbf future
+  if(p.nbf&&p.nbf>n) F.push({sev:'warning',title:'nbf in future — not yet valid',desc:`Token not valid until ${fmtTs(p.nbf)}.`});
+
+  // missing iss
+  if(!p.iss) F.push({sev:'info',title:'No issuer (iss)',desc:'iss lets your server reject tokens not issued by your own auth service.'});
+
+  // missing aud
+  if(!p.aud) F.push({sev:'info',title:'No audience (aud)',desc:'aud prevents cross-service token replay — a mobile app token should not work on the admin API.'});
+
+  // missing nbf
+  if(!p.nbf) F.push({sev:'info',title:'No nbf (not-before)',desc:'nbf enables future-scheduled access grants and prevents immediate reuse of just-issued tokens.'});
+
+  // missing jti
+  if(!p.jti) F.push({sev:'info',title:'No jti (JWT ID) — replay risk',desc:'Without jti you cannot maintain a denylist. Logged-out tokens remain valid until expiry.',fix_key:'no_jti'});
+
+  // sensitive fields
+  const SENS=['password','passwd','pw','secret','credit_card','cc','cvv','ssn','dob','pin','private_key','api_key'];
+  const sens=Object.keys(p).filter(k=>SENS.some(s2=>k.toLowerCase().includes(s2)));
+  if(sens.length) F.push({sev:'critical',title:`Sensitive data in payload: ${sens.join(', ')}`,desc:'JWT payloads are Base64-encoded — NOT encrypted. Anyone who captures the token can read these. Remove or use JWE.'});
+
+  // role escalation warning
+  const rv=p.role||p.roles||p.scope||p.permissions;
+  if(rv&&/admin|root|superuser|sudo/i.test(JSON.stringify(rv))) F.push({sev:'warning',title:'Privilege claim present — verify enforcement',desc:`Elevated role detected (${JSON.stringify(rv)}). Re-validate against DB on every request; never trust payload claims alone.`});
+
+  // oversized payload
+  const psz=JSON.stringify(p).length;
+  if(psz>2048) F.push({sev:'warning',title:`Large payload (${psz} bytes) — DoS risk`,desc:'Oversized JWTs slow verification and can hit header size limits. Keep payloads < 512 bytes; move bulk data to DB lookup by sub.'});
+
+  // all-clear
+  if(p.exp&&p.iss&&p.aud&&p.jti&&p.sub) F.push({sev:'ok',title:'Core claims complete (sub, exp, iss, aud, jti)',desc:'All essential claims present. Ensure your verification code requires and validates each one.'});
+
+  return F;
+}
+
+function calcScore(F){
+  let s=100;
+  F.forEach(f=>{if(f.sev==='critical')s-=24;else if(f.sev==='warning')s-=9;else if(f.sev==='info')s-=3;else if(f.sev==='ok')s+=3});
+  return Math.max(0,Math.min(100,s));
+}
+
+// ── RENDER ANALYSIS ──
+function renderAnalysis(score,findings,pyFix){
+  const c=document.getElementById('analysisContainer');
+  let html='';
+  if(score!==null){
+    const circ=2*Math.PI*22,dash=(score/100)*circ;
+    const col=score>=80?'var(--green)':score>=50?'var(--amber)':'var(--red)';
+    const lbl=score>=80?'Secure':score>=50?'Needs Work':'Vulnerable';
+    const cr=findings.filter(f=>f.sev==='critical').length,wn=findings.filter(f=>f.sev==='warning').length,inf=findings.filter(f=>f.sev==='info').length,ok=findings.filter(f=>f.sev==='ok').length;
+    html+=`<div class="swrap">
+      <div class="ring-outer">
+        <svg width="52" height="52" viewBox="0 0 52 52">
+          <circle class="rbg" cx="26" cy="26" r="22"/>
+          <circle class="rfill" cx="26" cy="26" r="22" stroke="${col}" stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}"/>
+        </svg>
+        <div class="rlabel" style="color:${col}">${score}</div>
+      </div>
+      <div class="stext">
+        <h3 style="color:${col}">${lbl}</h3>
+        <p>${cr} critical · ${wn} warnings · ${inf} info · ${ok} ok</p>
+        <p style="margin-top:2px">${findings.length} checks total</p>
+      </div>
+    </div>`;
+  }
+  const icons={critical:'🔴',warning:'🟡',info:'🔵',ok:'🟢'};
+  findings.forEach(f=>{
+    html+=`<div class="finding f-${f.sev[0]}">
+      <div class="ficon">${icons[f.sev]||'⚪'}</div>
+      <div><div class="ftitle">${esc(f.title)}</div><div class="fdesc">${f.desc}</div></div>
+    </div>`;
+  });
+  if(pyFix) html+=`<div class="fixblock" style="margin-top:13px"><div class="fixhdr"><span>🐍 Python / PyJWT — Secure Fix</span><button class="btn btn-sm" onclick="copyFix()">⎘ Copy</button></div><div class="fixcode">${pyFix}</div></div>`;
+  c.innerHTML=html;
+}
+
+// ── PYTHON FIX ──
+function buildPyFix(h,p,findings){
+  const alg=h?h.alg:'HS256';
+  const useAsym=!h||['none','HS256','HS384','HS512'].includes(alg);
+  const L=[];
+  L.push(`<span class="pc"># JWT Secure Fix — generated by JWT Analyzer</span>`);
+  L.push(`<span class="pc"># pip install PyJWT cryptography</span>`);
+  L.push(``);
+  L.push(`<span class="pk">import</span> <span class="pb">jwt</span>, <span class="pb">uuid</span>, <span class="pb">secrets</span>`);
+  L.push(`<span class="pk">from</span> <span class="pb">datetime</span> <span class="pk">import</span> datetime, timedelta, timezone`);
+  if(useAsym){
+    L.push(`<span class="pk">from</span> <span class="pb">cryptography.hazmat.primitives.asymmetric</span> <span class="pk">import</span> rsa`);
+    L.push(``);
+    L.push(`<span class="pc"># Generate RSA-2048 once; store in KMS/Vault</span>`);
+    L.push(`<span class="pv">private_key</span> = rsa.generate_private_key(public_exponent=<span class="pn">65537</span>, key_size=<span class="pn">2048</span>)`);
+    L.push(`<span class="pv">public_key</span>  = <span class="pv">private_key</span>.public_key()`);
+  } else {
+    L.push(``);
+    L.push(`<span class="pc"># 256-bit cryptographically random secret</span>`);
+    L.push(`<span class="pv">SECRET</span> = secrets.token_hex(<span class="pn">32</span>)`);
+  }
+  L.push(``);
+  L.push(`<span class="pk">def</span> <span class="pf">issue_token</span>(user_id: str, role: str) -> str:`);
+  L.push(`    <span class="pv">now</span> = datetime.now(timezone.utc)`);
+  L.push(`    <span class="pk">return</span> jwt.encode({`);
+  L.push(`        <span class="ps">"sub"</span>: user_id, <span class="ps">"role"</span>: role,`);
+  L.push(`        <span class="ps">"iss"</span>: <span class="ps">"https://auth.myapp.com"</span>,`);
+  L.push(`        <span class="ps">"aud"</span>: <span class="ps">"myapp-api"</span>,`);
+  L.push(`        <span class="ps">"iat"</span>: now, <span class="ps">"nbf"</span>: now,`);
+  L.push(`        <span class="ps">"exp"</span>: now + timedelta(minutes=<span class="pn">15</span>),`);
+  L.push(`        <span class="ps">"jti"</span>: str(uuid.uuid4()),`);
+  L.push(`    },`);
+  if(useAsym){
+    L.push(`    <span class="pv">private_key</span>, algorithm=<span class="ps">"RS256"</span>,`);
+    L.push(`    headers={<span class="ps">"kid"</span>: <span class="ps">"key-2024-01"</span>})`);
+  } else {
+    L.push(`    <span class="pv">SECRET</span>, algorithm=<span class="ps">"${alg}"</span>)`);
+  }
+  L.push(``);
+  L.push(`<span class="pk">def</span> <span class="pf">verify_token</span>(token: str) -> dict:`);
+  if(useAsym){
+    L.push(`    <span class="pk">return</span> jwt.decode(token, <span class="pv">public_key</span>,`);
+    L.push(`        algorithms=[<span class="ps">"RS256"</span>], audience=<span class="ps">"myapp-api"</span>,`);
+    L.push(`        issuer=<span class="ps">"https://auth.myapp.com"</span>,`);
+    L.push(`        options={<span class="ps">"require"</span>:[<span class="ps">"exp"</span>,<span class="ps">"iss"</span>,<span class="ps">"aud"</span>,<span class="ps">"jti"</span>,<span class="ps">"sub"</span>]})`);
+  } else {
+    L.push(`    <span class="pk">return</span> jwt.decode(token, <span class="pv">SECRET</span>,`);
+    L.push(`        algorithms=[<span class="ps">"${alg}"</span>],`);
+    L.push(`        options={<span class="ps">"require"</span>:[<span class="ps">"exp"</span>,<span class="ps">"iss"</span>,<span class="ps">"aud"</span>,<span class="ps">"jti"</span>]})`);
+  }
+  L.push(``);
+  L.push(`<span class="pk">def</span> <span class="pf">revoke</span>(jti: str, ttl: int): redis.setex(<span class="pf">f</span><span class="ps">"rv:{jti}"</span>, ttl, <span class="pn">1</span>)`);
+  L.push(`<span class="pk">def</span> <span class="pf">is_revoked</span>(jti: str) -> bool: <span class="pk">return</span> bool(redis.exists(<span class="pf">f</span><span class="ps">"rv:{jti}"</span>))`);
+  return L.join('\n');
+}
+
+// ── VERIFY SIG ──
+async function verifySignature(){
+  const token=document.getElementById('tokenInput').value.trim();
+  const secret=document.getElementById('verifySecret').value;
+  const alg=document.getElementById('verifyAlg').value;
+  const el=document.getElementById('verifyResult');
+  if(!token||!secret){el.innerHTML='<div class="vres vfail">Enter both a token and a secret.</div>';return}
+  const parts=token.split('.');
+  if(parts.length!==3){el.innerHTML='<div class="vres vfail">Invalid token format.</div>';return}
+  const computed=await hmacSign(secret,parts[0]+'.'+parts[1],alg);
+  if(u8toB64url(computed)===parts[2])
+    el.innerHTML=`<div class="vres vok">✅ Signature VALID — secret matches (${alg})</div>`;
+  else
+    el.innerHTML=`<div class="vres vfail">❌ Signature INVALID — wrong secret or algorithm</div>`;
+}
+
+// ── BRUTE FORCE ──
+const WL100=['secret','password','123456','abc123','qwerty','letmein','welcome','admin','monkey','dragon','master','superman','batman','trustno1','sunshine','princess','shadow','login','pass','test','hello','world','jwt','token','key','mykey','secretkey','jwtkey','jwttoken','jwtpassword','jwtsecret','auth','authkey','authtoken','authsecret','signing_key','signing-key','signingkey','api_key','apikey','api-key','app_secret','appsecret','client_secret','clientsecret','private','privatekey','private_key','hmac','hmackey','hmac_key','hmac_secret','changeme','changethis','default','insecure','password123','pass123','p@ssw0rd','P@ssw0rd','P@$$w0rd','admin123','Admin123','admin@123','root','rootpass','toor','1234','12345','123456789','000000','111111','qwerty123','abc','xyz','foobar','foo','bar','baz','test123','testing','dev','development','staging','production','prod','local','localhost','example','sample','demo','mypassword','myapp','webapp','nodejs','python','java','golang','secret_key','SECRET_KEY','SECRET','PASSWORD','ADMIN','your-256-bit-secret','your-secret-key','your_secret_key','HS256KEY'];
+const WL500=[...WL100,...['qazwsx','zxcvbn','asdfgh','1q2w3e','1q2w3e4r','pass@word','passw0rd','p4ssw0rd','super','super_secret','supersecret','secure','security','hardcoded','hack','hacker','crackme','weak','vuln','exploit','bypass','none','algnone','nosig','unsigned','notasecret','randomkey','random','temp','temporary','testkey','devkey','devtoken','devpass','stagekey','prodkey','prodsecret','appkey','apptoken','application_secret','app_signing_key','jwt_signing_secret','TOKEN_SECRET','ACCESS_TOKEN_SECRET','REFRESH_TOKEN_SECRET','SESSION_SECRET','COOKIE_SECRET','NEXT_AUTH_SECRET','NEXTAUTH_SECRET','NUXT_AUTH_SECRET','REACT_APP_SECRET','VUE_APP_SECRET','auth0','auth0secret','firebase','firebasekey','cognito','cognitokey','okta','supabase','supabasesecret','clerk','mysql','postgres','mongodb','redis','sqlite','database','db_password','db_secret','aws','azure','gcp','github','gitlab','bitbucket','heroku','render','vercel','netlify','2023','2024','2025','2026','company','startup','corp','enterprise','service','microservice','backend','frontend','mobile','api_secret_key','api_signing_key','bearer_secret','oauth_secret','oidc_secret','csrf_secret','cookie_secret_key','encryption_key','aes_key','rsa_key','abcdef','12345678','11111111','00000000','password1','password12','qwerty1234','admin1234','root1234','sysadmin','operator','guest','guestpass','user','userpass','access','accesskey','master_key','master_secret','alpha','beta','gamma','delta','omega','sigma','red','blue','green','yellow','purple','black','white','fire','water','dog','cat','lion','tiger']];
+
+function setupBrute(signIn,s64,alg){
+  bruteSignIn=signIn;
+  if(s64){
+    let s=s64.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';
+    try{const b=atob(s);bruteSigBytes=new Uint8Array(b.length);for(let i=0;i<b.length;i++)bruteSigBytes[i]=b.charCodeAt(i)}catch(e){bruteSigBytes=null}
+  } else bruteSigBytes=null;
+  document.getElementById('bruteAlg').value=alg;
+  resetBruteUI();
+}
+
+function onWLChange(){
+  const v=document.getElementById('wordlistSel').value;
+  document.getElementById('customWords').style.display=v==='custom'?'block':'none';
+  if(v!=='custom') document.getElementById('wlLabel').textContent=v==='top100'?'100 words':'500 words';
+  else updateWLCount();
+  resetBruteUI();
+}
+
+function updateWLCount(){
+  const n=document.getElementById('customWords').value.split('\n').map(s=>s.trim()).filter(Boolean).length;
+  document.getElementById('wlLabel').textContent=n+' words';
+}
+
+function resetBruteUI(){
+  document.getElementById('bpbar').style.width='0%';
+  document.getElementById('bpbar').style.background='var(--amber)';
+  document.getElementById('bstatus').textContent='Ready — click ▶ Run to start';
+  document.getElementById('bruteResult').innerHTML='';
+  document.getElementById('sTested').textContent='0';
+  document.getElementById('sSpeed').textContent='—';
+  document.getElementById('sTime').textContent='0.0s';
+  document.getElementById('sLeft').textContent='—';
+}
+
+async function toggleBrute(){
+  if(bruteRunning){bruteAbort=true;return}
+  await startBrute();
+}
+
+async function startBrute(){
+  if(!bruteSigBytes){document.getElementById('bruteResult').innerHTML='<div class="safebox">⚠ No signature to crack.</div>';return}
+  const wv=document.getElementById('wordlistSel').value;
+  let words=wv==='custom'?document.getElementById('customWords').value.split('\n').map(s=>s.trim()).filter(Boolean):wv==='top100'?WL100:WL500;
+  if(!words.length){document.getElementById('bstatus').textContent='Enter words first.';return}
+  const alg=document.getElementById('bruteAlg').value;
+  bruteRunning=true;bruteAbort=false;
+  document.getElementById('bruteBtn').textContent='■ Stop';
+  document.getElementById('bruteResult').innerHTML='';
+  const total=words.length,t0=Date.now();
+  let tested=0,found=null;
+  for(let i=0;i<words.length;i++){
+    if(bruteAbort) break;
+    const w=words[i];
+    const sig=await hmacSign(w,bruteSignIn,alg);
+    tested++;
+    if(tested%5===0||tested===total){
+      const el=(Date.now()-t0)/1000,pct=Math.round(tested/total*100),sp=el>0?Math.round(tested/el):0;
+      document.getElementById('bpbar').style.width=pct+'%';
+      document.getElementById('bstatus').textContent=`Testing "${w}" … ${tested}/${total}`;
+      document.getElementById('sTested').textContent=tested;
+      document.getElementById('sSpeed').textContent=sp.toLocaleString();
+      document.getElementById('sTime').textContent=el.toFixed(1)+'s';
+      document.getElementById('sLeft').textContent=sp>0?fmtDur(Math.round((total-tested)/sp)):'—';
+      await new Promise(r=>setTimeout(r,0));
+    }
+    if(bytesEq(sig,bruteSigBytes)){found=w;break}
+  }
+  const elapsed=((Date.now()-t0)/1000).toFixed(2);
+  bruteRunning=false;document.getElementById('bruteBtn').textContent='▶ Run';
+  if(found){
+    document.getElementById('bpbar').style.background='var(--red)';document.getElementById('bpbar').style.width='100%';
+    document.getElementById('bstatus').textContent=`🔴 Cracked in ${elapsed}s`;
+    document.getElementById('bruteResult').innerHTML=`<div class="crackbox"><div class="clabel">🔴 SECRET CRACKED</div><div class="csecret">${esc(found)}</div><div style="font-size:10.5px;color:var(--text2);margin-top:4px">All tokens signed with this secret are compromised. Rotate immediately.</div></div><div class="fixblock" style="margin-top:8px"><div class="fixhdr"><span>🐍 Rotate Secret (Python)</span></div><div class="fixcode"><span class="pk">import</span> <span class="pb">secrets</span>
+<span class="pc"># Cracked: "${esc(found)}"</span>
+<span class="pv">NEW_SECRET</span> = secrets.token_hex(<span class="pn">32</span>)  <span class="pc"># 256-bit</span>
+<span class="pc"># Invalidate all tokens:</span>
+<span class="pc"># 1. Update SECRET in env/KMS</span>
+<span class="pc"># 2. Add token_version to User model</span>
+<span class="pc"># 3. Increment version for ALL users</span>
+<span class="pc"># 4. Reject tokens where payload.version != db.version</span></div></div>`;
+  } else if(bruteAbort){
+    document.getElementById('bstatus').textContent=`Stopped at ${tested}/${words.length}`;
+  } else {
+    document.getElementById('bpbar').style.background='var(--green)';document.getElementById('bpbar').style.width='100%';
+    document.getElementById('bstatus').textContent=`✓ Not found in ${words.length} words (${elapsed}s)`;
+    document.getElementById('bruteResult').innerHTML='<div class="safebox">🟢 Secret not in this wordlist. Try a larger list or custom words — absence here does not confirm the secret is strong.</div>';
+  }
+}
+
+// ── VERIFY SIG DONE ABOVE ──
+
+// ── FORGE ──
+let FC={h:[{k:'alg',v:'HS256'},{k:'typ',v:'JWT'}],p:[{k:'sub',v:'user_123'},{k:'role',v:'user'},{k:'iat',v:String(NOW)},{k:'exp',v:String(NOW+900)}]};
+
+function initForge(){renderFClaims()}
+function renderFClaims(){
+  const sec={h:'forgeHClaims',p:'forgePClaims'};
+  ['h','p'].forEach(s=>{
+    document.getElementById(sec[s]).innerHTML=FC[s].map((c,i)=>`
+      <div class="crow">
+        <input class="inp ckey" value="${esc(c.k)}" placeholder="key" oninput="FC['${s}'][${i}].k=this.value">
+        <input class="inp" value="${esc(c.v)}" placeholder="value" oninput="FC['${s}'][${i}].v=this.value" style="flex:1">
+        <button class="cdel" onclick="remClaim('${s}',${i})">×</button>
+      </div>`).join('');
+  });
+}
+function addClaim(s){FC[s].push({k:'',v:''});renderFClaims()}
+function remClaim(s,i){FC[s].splice(i,1);renderFClaims()}
+
+function parseVal(v){
+  if(v==='true')return true;if(v==='false')return false;if(v==='null')return null;
+  const n=Number(v);if(!isNaN(n)&&v!=='')return n;
+  try{return JSON.parse(v)}catch(e){return v}
+}
+
+async function forgeToken(){
+  const hObj={},pObj={};
+  FC.h.forEach(c=>{if(c.k)hObj[c.k]=parseVal(c.v)});
+  FC.p.forEach(c=>{if(c.k)pObj[c.k]=parseVal(c.v)});
+  const h64=b64url(hObj),p64=b64url(pObj);
+  const secret=document.getElementById('forgeSecret').value;
+  const alg=document.getElementById('forgeAlg').value;
+  let token;
+  if(alg==='none'||!secret){
+    token=h64+'.'+p64+'.';
+  } else {
+    const sig=await hmacSign(secret,h64+'.'+p64,alg);
+    token=h64+'.'+p64+'.'+u8toB64url(sig);
+  }
+  document.getElementById('forgeOut').textContent=token;
+  document.getElementById('forgePreview').innerHTML=`
+    <div class="dblock"><div class="dbhdr"><span class="lh">● Header</span></div><div class="dbbody">${colorJson(hObj)}</div></div>
+    <div class="dblock"><div class="dbhdr"><span class="lp">● Payload</span></div><div class="dbbody">${colorJson(pObj)}</div></div>`;
+}
+
+function resetForge(){
+  FC={h:[{k:'alg',v:'HS256'},{k:'typ',v:'JWT'}],p:[{k:'sub',v:'user_123'},{k:'role',v:'user'},{k:'iat',v:String(NOW)},{k:'exp',v:String(NOW+900)}]};
+  document.getElementById('forgeSecret').value='';
+  document.getElementById('forgeOut').textContent='Token appears here after generation…';
+  document.getElementById('forgePreview').innerHTML='<div class="empty"><div class="eicon">⚗️</div>Generate a token to preview it</div>';
+  renderFClaims();
+}
+
+function loadForgeFromAnalysis(){
+  if(!curHdr||!curPay){toast('Analyze a token first');return}
+  FC.h=Object.entries(curHdr).map(([k,v])=>({k,v:typeof v==='string'?v:JSON.stringify(v)}));
+  FC.p=Object.entries(curPay).map(([k,v])=>({k,v:typeof v==='string'?v:JSON.stringify(v)}));
+  renderFClaims(); toast('Loaded from current token');
+}
+
+function copyForged(){
+  const t=document.getElementById('forgeOut').textContent;
+  if(t.includes('appears here')) return;
+  navigator.clipboard.writeText(t).then(()=>toast('Token copied!'));
+}
+
+function sendForgedToAnalyzer(){
+  const t=document.getElementById('forgeOut').textContent;
+  if(t.includes('appears here')) return;
+  document.getElementById('tokenInput').value=t;
+  liveUpdate(); doAnalyze(); switchTabById('analyze'); toast('Sent to Analyzer');
+}
+
+function applyPreset(p){
+  const PR={
+    admin:{h:[{k:'alg',v:'HS256'},{k:'typ',v:'JWT'}],p:[{k:'sub',v:'user_123'},{k:'role',v:'admin'},{k:'is_admin',v:'true'},{k:'iat',v:String(NOW)},{k:'exp',v:String(NOW+900)}]},
+    longexp:{h:[{k:'alg',v:'HS256'},{k:'typ',v:'JWT'}],p:[{k:'sub',v:'user_123'},{k:'role',v:'user'},{k:'iat',v:String(NOW)},{k:'exp',v:String(NOW+86400*30)}]},
+    noexp:{h:[{k:'alg',v:'HS256'},{k:'typ',v:'JWT'}],p:[{k:'sub',v:'user_123'},{k:'role',v:'user'},{k:'iat',v:String(NOW)}]},
+    algnone:{h:[{k:'alg',v:'none'},{k:'typ',v:'JWT'}],p:[{k:'sub',v:'attacker'},{k:'role',v:'admin'},{k:'iat',v:String(NOW)}]},
+    minimal:{h:[{k:'alg',v:'HS256'}],p:[{k:'sub',v:'user_123'}]},
+    rs256hdr:{h:[{k:'alg',v:'RS256'},{k:'typ',v:'JWT'},{k:'kid',v:'key-2024-01'}],p:[{k:'sub',v:'user_123'},{k:'iss',v:'https://auth.myapp.com'},{k:'aud',v:'myapp-api'},{k:'iat',v:String(NOW)},{k:'exp',v:String(NOW+900)},{k:'jti',v:'jti-'+Math.random().toString(36).slice(2)}]}
+  };
+  if(PR[p]){FC=PR[p];renderFClaims()}
+}
+
+// ── ATTACK DEMO ──
+async function demoAttack(type){
+  const el=document.getElementById('attackOut');
+  let token='',desc='',label='';
+  if(type==='none'){
+    const h=b64url({alg:'none',typ:'JWT'}),p=b64url({sub:'victim',role:'admin',iat:NOW,exp:NOW+3600});
+    token=h+'.'+p+'.';
+    label='alg:none Forged Admin Token';
+    desc='Attacker decoded a user token, changed <code style="color:var(--amber);font-family:var(--mono)">role:"user"</code> → <code style="color:var(--red);font-family:var(--mono)">role:"admin"</code>, set <code style="color:var(--amber);font-family:var(--mono)">alg:"none"</code>, removed signature. Vulnerable servers accept it with no verification.';
+  } else if(type==='algconfusion'){
+    const h=b64url({alg:'HS256',typ:'JWT'}),p=b64url({sub:'attacker',role:'admin',iss:'https://auth.myapp.com',iat:NOW,exp:NOW+3600});
+    const fakeSig=await hmacSign('<RSA_PUBLIC_KEY_BYTES_HERE>',h+'.'+p,'HS256');
+    token=h+'.'+p+'.'+u8toB64url(fakeSig);
+    label='Algorithm Confusion Attack Token';
+    desc='Server uses RS256. Attacker downloads the public key, flips header to <code style="color:var(--red);font-family:var(--mono)">HS256</code>, signs using the public key as HMAC secret. Server verifies with public key — it matches. Admin granted.';
+  } else if(type==='kid'){
+    const h=b64url({alg:'HS256',typ:'JWT',kid:"../../dev/null'; DROP TABLE keys;--"}),p=b64url({sub:'injector',role:'superadmin',iat:NOW,exp:NOW+86400});
+    token=h+'.'+p+'.injectionPayload';
+    label='kid Injection Attack Token';
+    desc='kid contains path traversal + SQL injection. If the server passes kid unsanitized to filesystem or DB, attacker controls key lookup or crashes the system.';
+  } else if(type==='bruteforce'){
+    const h=b64url({alg:'HS256',typ:'JWT'}),p=b64url({sub:'user_123',role:'user',iat:NOW-3600,exp:NOW+3600});
+    const sig=await hmacSign('secret',h+'.'+p,'HS256');
+    token=h+'.'+p+'.'+u8toB64url(sig);
+    label='Weak HS256 Token (secret: "secret")';
+    desc='Signed with <code style="color:var(--red);font-family:var(--mono)">"secret"</code> — #1 in every wordlist. Send to Analyzer tab and run brute-force — cracks in under 1 second.';
+  } else if(type==='replay'){
+    const h=b64url({alg:'HS256',typ:'JWT'}),p=b64url({sub:'user_123',role:'user',iat:NOW-7200});
+    const sig=await hmacSign('somekey',h+'.'+p,'HS256');
+    token=h+'.'+p+'.'+u8toB64url(sig);
+    label='No-Expiry Replay Token';
+    desc='No <code style="color:var(--red);font-family:var(--mono)">exp</code>, no <code style="color:var(--red);font-family:var(--mono)">jti</code>. Issued 2 hours ago but permanently valid. Intercepted from logs, network traffic, or browser history — good forever.';
+  } else if(type==='privesc'){
+    const h=b64url({alg:'HS256',typ:'JWT'}),p=b64url({sub:'user_123',role:'admin',permissions:['read','write','delete','admin'],iat:NOW,exp:NOW+3600});
+    const sig=await hmacSign('weakkey',h+'.'+p,'HS256');
+    token=h+'.'+p+'.'+u8toB64url(sig);
+    label='Privilege Escalation Token';
+    desc='Payload tampered: <code style="color:var(--amber);font-family:var(--mono)">role:"user"</code> → <code style="color:var(--red);font-family:var(--mono)">role:"admin"</code> with full permissions array. If sig verification is misconfigured, this grants admin access.';
+  }
+  const parts=token.split('.');
+  el.innerHTML=`
+    <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:9px 12px;margin-bottom:9px">
+      <div style="font-size:10px;color:var(--red);font-weight:600;letter-spacing:.4px;margin-bottom:3px">⚠ ${label}</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:7px">${desc}</div>
+      <div style="font-family:var(--mono);font-size:10px;word-break:break-all;line-height:1.8">
+        <span class="jh">${esc(parts[0]||'')}</span><span class="jdot">.</span><span class="jp">${esc(parts[1]||'')}</span><span class="jdot">.</span><span class="js">${esc(parts[2]||'')}</span>
+      </div>
+    </div>
+    <div class="brow">
+      <button class="btn btn-sm" onclick="sendAttackToAnalyzer(this)">→ Send to Analyzer</button>
+      <button class="btn btn-sm" onclick="navigator.clipboard.writeText(this.dataset.t).then(()=>toast('Copied!'))" data-t="${esc(token)}">⎘ Copy</button>
+    </div>`;
+  el.querySelector('[onclick*="sendAttackToAnalyzer"]').dataset.t=token;
+  el.querySelector('[onclick*="sendAttackToAnalyzer"]').onclick=()=>{
+    document.getElementById('tokenInput').value=token;
+    liveUpdate(); doAnalyze(); switchTabById('analyze');
+  };
+}
+
+// ── HISTORY ──
+function saveHist(token,h,p,score,findings){
+  const e={id:Date.now(),token,alg:h?h.alg:'?',sub:p?(p.sub||'—'):'—',score,crits:findings.filter(f=>f.sev==='critical').length,ts:new Date().toLocaleTimeString()};
+  history.unshift(e);if(history.length>50)history=history.slice(0,50);
+  try{localStorage.setItem('jwtHist',JSON.stringify(history))}catch(e2){}
+}
+
+function renderHistory(){
+  const el=document.getElementById('historyList');
+  if(!history.length){el.innerHTML='<div class="empty"><div class="eicon">📜</div>No history yet. Analyze a token first.</div>';return}
+  el.innerHTML=history.map(e=>{
+    const ac=['HS256','HS384','HS512'].includes(e.alg)?'halg-h':e.alg==='none'?'halg-n':'halg-a';
+    const col=e.score>=80?'var(--green)':e.score>=50?'var(--amber)':'var(--red)';
+    const prev=e.token.length>55?e.token.substring(0,55)+'…':e.token;
+    return`<div class="histitem" onclick="loadHE(${e.id})">
+      <span class="halg ${ac}">${esc(e.alg||'?')}</span>
+      <div style="flex:1;min-width:0">
+        <div class="hsub">sub: ${esc(e.sub)} ${e.crits>0?`<span style="font-size:9.5px;background:rgba(239,68,68,0.15);color:var(--red);padding:1px 5px;border-radius:3px;margin-left:4px">${e.crits} crit</span>`:''}</div>
+        <div class="hprev">${esc(prev)}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:11px;font-family:var(--mono);font-weight:600;color:${col}">${e.score}</div>
+        <div style="font-size:9.5px;color:var(--text3)">${e.ts}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function loadHE(id){
+  const e=history.find(h=>h.id===id);if(!e)return;
+  document.getElementById('tokenInput').value=e.token;
+  liveUpdate();doAnalyze();switchTabById('analyze');
+}
+function clearHistory(){history=[];try{localStorage.removeItem('jwtHist')}catch(e){}renderHistory()}
+function exportHistory(){download('jwt-history.json',JSON.stringify(history,null,2),'application/json');toast('History exported!')}
+
+// ── MISC ──
+function clearAll(){
+  document.getElementById('tokenInput').value='';
+  document.getElementById('tokenColored').innerHTML='<span style="color:var(--text3);font-family:var(--mono);font-size:11px">Paste a token above…</span>';
+  document.getElementById('decodeSection').innerHTML='<div class="empty"><div class="eicon">🔍</div>Header · Payload · Signature appear here</div>';
+  document.getElementById('analysisContainer').innerHTML='<div class="empty"><div class="eicon">🛡️</div>Analyze a token to see findings,<br>score, timestamps and Python fix</div>';
+  document.getElementById('bruteSection').style.display='none';
+  document.getElementById('verifyResult').innerHTML='';
+  curHdr=null;curPay=null;curSig='';curFindings=[];curPyFix='';
+}
+
+function copyFix(){
+  if(!curPyFix){toast('Analyze a token first');return}
+  const d=document.createElement('div');d.innerHTML=curPyFix;
+  navigator.clipboard.writeText(d.textContent||d.innerText||'').then(()=>toast('Python fix copied!'));
+}
+
+function exportReport(){
+  if(!curHdr||!curPay){toast('Analyze a token first');return}
+  const r={generated:new Date().toISOString(),token:document.getElementById('tokenInput').value.trim(),header:curHdr,payload:curPay,score:calcScore(curFindings),findings:curFindings.map(f=>({severity:f.sev,title:f.title,description:f.desc}))};
+  download('jwt-report.json',JSON.stringify(r,null,2),'application/json');
+  toast('Report downloaded!');
+}
+
+// ── INIT ──
+initForge();
+</script>
+</body>
+</html>
